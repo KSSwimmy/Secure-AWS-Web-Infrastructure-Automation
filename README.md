@@ -1,2 +1,2 @@
 # Secure-AWS-Web-Infrastructure-Automation
-his project was built to solve a specific business problem for a fast-growing B2B SaaS startup.
+This project was built to solve a specific business problem for a fast-growing B2B SaaS startup.
