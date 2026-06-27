@@ -38,4 +38,3 @@ To meet the client's strict security requirements, this infrastructure was built
 
 ## 📈 Monitoring & Alerts
 *(Screenshots of CloudWatch dashboard and CPU alerts will go here once completed in Phase 4)*
-.
