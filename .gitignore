@@ -1,0 +1,4 @@
+notes.md
+.terraform/
+*.tfstate
+*.tfstate.backup
