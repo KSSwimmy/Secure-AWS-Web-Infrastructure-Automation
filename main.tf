@@ -56,22 +56,80 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] 
 }
 
+# MANUALLY CONFIGURED EC2 WEB SERVER (without user_data script) //////////////////////////////////////////////////////
+# # 6. Create the EC2 Web Server
+# resource "aws_instance" "web_server" {
+#   # Injects the dynamic ID of the Ubuntu image we found in the data block above
+#   ami           = data.aws_ami.ubuntu.id
+  
+#   # Sets the hardware size of the server. 
+#   # Note: We upgraded this from "t2.micro" to "t3.micro" because AWS is actively phasing out 
+#   # the older t2 hardware family. For newly recovered accounts, t3.micro is the modern 
+#   # Free Tier standard required to prevent launch blocks.
+#   instance_type = "t3.micro" 
+  
+#   # Securely attaches the modern standalone security group (firewall) we created earlier
+#   vpc_security_group_ids = [aws_security_group.web_server_sg.id]
+
+#   # Assigns a readable name to the server so it is easily identifiable in the AWS Management Console
+#   tags = {
+#     Name = "portfolio-web-server"
+#   }
+# }
+
+# AUTOMATED CONFIGURED EC2 WEB SERVER (with user_data script) //////////////////////////////////////////////////////
 # 6. Create the EC2 Web Server
 resource "aws_instance" "web_server" {
   # Injects the dynamic ID of the Ubuntu image we found in the data block above
   ami           = data.aws_ami.ubuntu.id
   
-  # Sets the hardware size of the server. 
-  # Note: We upgraded this from "t2.micro" to "t3.micro" because AWS is actively phasing out 
-  # the older t2 hardware family. For newly recovered accounts, t3.micro is the modern 
-  # Free Tier standard required to prevent launch blocks.
+  # Sets the modern Free Tier standard hardware size
   instance_type = "t3.micro" 
+
+  # Attaches the IAM instance profile to allow the EC2 instance to communicate with CloudWatch
+  iam_instance_profile = aws_iam_instance_profile.cloudwatch_profile.name
   
-  # Securely attaches the modern standalone security group (firewall) we created earlier
+  # Securely attaches the modern standalone security group (firewall)
   vpc_security_group_ids = [aws_security_group.web_server_sg.id]
 
-  # Assigns a readable name to the server so it is easily identifiable in the AWS Management Console
+  # NEW: The user_data script automatically configures the server upon boot.
+  # Note: AWS runs user_data scripts as the root user, so 'sudo' is not required.
+  user_data = <<-EOF
+              #!/bin/bash
+              apt-get update -y
+              apt-get install nginx -y
+              systemctl start nginx
+              systemctl enable nginx
+              EOF
+
   tags = {
     Name = "portfolio-web-server"
   }
+}
+
+# 7. IAM Role for CloudWatch
+resource "aws_iam_role" "cloudwatch_role" {
+  name = "ec2_cloudwatch_role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
+    }]
+  })
+}
+
+# 8. Attach CloudWatch Policy
+resource "aws_iam_role_policy_attachment" "cloudwatch_policy_attach" {
+  role       = aws_iam_role.cloudwatch_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+# 9. Create Instance Profile
+resource "aws_iam_instance_profile" "cloudwatch_profile" {
+  name = "ec2_cloudwatch_profile"
+  role = aws_iam_role.cloudwatch_role.name
 }
