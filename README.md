@@ -10,18 +10,18 @@ This project was built to solve a real-world business problem for a fast-growing
 
 ## 🛠️ The Tech Stack
 As a fellow DIY-er and recently new infrastructure nerd, I chose these specific tools for their power and cost-effectiveness:
-*   ☁️ **Cloud Provider:** Amazon Web Services (AWS)
-*   🏗️ **Infrastructure as Code:** Terraform
-*   🐧 **OS:** Ubuntu Linux 22.04 LTS
-*   🌐 **Web Server:** Nginx (managed via `systemd`)
-*   🔒 **Security & Governance:** AWS Security Groups, IAM, SSH Key-Based Authentication[cite: 4, 26]
-*   👁️ **Observability:** AWS CloudWatch[cite: 21, 26]
+*   **Cloud Provider:** Amazon Web Services (AWS)
+*   **Infrastructure as Code:** Terraform
+*   **OS:** Ubuntu Linux 22.04 LTS
+*   **Web Server:** Nginx (managed via `systemd`)
+*   **Security & Governance:** AWS Security Groups, IAM, SSH Key-Based Authentication[cite: 4, 26]
+*   **Observability:** AWS CloudWatch[cite: 21, 26]
 
 ## 🏰 Phase 1: Architecture & Security Implementation
 To meet strict security requirements, I built this with a major "Security-First" approach:
 1.  **Network Isolation:** Everything lives securely inside a dedicated Virtual Private Cloud (VPC).
 2.  **Strict Firewall Rules:** Security Groups are locked down to only allow HTTP traffic from the public web, and SSH access is heavily restricted.
-3.  **Hardened Compute:** The EC2 instance is configured to disable root password logins, enforcing cryptographic SSH keys. (We don't play around with security here! 🛑)
+3.  **Hardened Compute:** The EC2 instance is configured to disable root password logins, enforcing cryptographic SSH keys. (We don't play around with security here!)
 
 ## 🧪 Phase 2: Server Configuration & Troubleshooting
 Once the underlying infrastructure was provisioned via Terraform, I got under the hood to configure the host using EC2 Instance Connect.
@@ -116,7 +116,7 @@ Finally, I updated my `user_data` script to automatically download, configure, a
 ---
 
 <details>
-<summary><h2>🚨 Appendix A: Triage & Connectivity Resolution (Click to Expand 🔽)</h2></summary>
+<summary><h2>🚨 Appendix A: Triage & Connectivity Resolution (Trials and Tribulations 😩) (Click to Expand)</h2></summary>
 
 > This is where the fun problem-solving comes in! 😅
 > 
@@ -148,7 +148,7 @@ Finally, I updated my `user_data` script to automatically download, configure, a
 </details>
 
 <details>
-<summary><h2>📖 Appendix B: Deployment Instructions / Runbook (Click to Expand 🔽)</h2></summary>
+<summary><h2>📖 Appendix B: Deployment Instructions / Runbook (Click to Expand)</h2></summary>
 
 > *(Note: This section acts as the official SOP for the internal team. Documentation is my engineering superpower! *wink wink* 😉)*
 > 
