@@ -20,7 +20,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_http" {
 # 3. Inbound Rule: Allow Administrator SSH Access
 resource "aws_vpc_security_group_ingress_rule" "allow_ssh" {
   security_group_id = aws_security_group.web_server_sg.id
-  cidr_ipv4         = "0.0.0.0/0" # We will lock this down to your IP later!
+  cidr_ipv4         = var.admin_cidr
   from_port         = 22
   ip_protocol       = "tcp"
   to_port           = 22

@@ -1,4 +1,8 @@
-notes.md
+NOTES.md
 .terraform/
 *.tfstate
 *.tfstate.backup
+terraform.tfvars
+*.tfplan
+crash.log
+.DS_Store
