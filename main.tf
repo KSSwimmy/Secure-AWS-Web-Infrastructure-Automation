@@ -53,7 +53,7 @@ data "aws_ami" "ubuntu" {
   }
 
   # Ensures we are downloading the official, secure image directly from Canonical (Ubuntu's creator)
-  owners = ["099720109477"] 
+  owners = ["099720109477"]
 }
 
 # MANUALLY CONFIGURED EC2 WEB SERVER (without user_data script) //////////////////////////////////////////////////////
@@ -61,13 +61,13 @@ data "aws_ami" "ubuntu" {
 # resource "aws_instance" "web_server" {
 #   # Injects the dynamic ID of the Ubuntu image we found in the data block above
 #   ami           = data.aws_ami.ubuntu.id
-  
+
 #   # Sets the hardware size of the server. 
 #   # Note: We upgraded this from "t2.micro" to "t3.micro" because AWS is actively phasing out 
 #   # the older t2 hardware family. For newly recovered accounts, t3.micro is the modern 
 #   # Free Tier standard required to prevent launch blocks.
 #   instance_type = "t3.micro" 
-  
+
 #   # Securely attaches the modern standalone security group (firewall) we created earlier
 #   vpc_security_group_ids = [aws_security_group.web_server_sg.id]
 
@@ -81,14 +81,14 @@ data "aws_ami" "ubuntu" {
 # 6. Create the EC2 Web Server
 resource "aws_instance" "web_server" {
   # Injects the dynamic ID of the Ubuntu image we found in the data block above
-  ami           = data.aws_ami.ubuntu.id
-  
+  ami = data.aws_ami.ubuntu.id
+
   # Sets the modern Free Tier standard hardware size
-  instance_type = "t3.micro" 
+  instance_type = "t3.micro"
 
   # Attaches the IAM instance profile to allow the EC2 instance to communicate with CloudWatch
   iam_instance_profile = aws_iam_instance_profile.cloudwatch_profile.name
-  
+
   # Securely attaches the modern standalone security group (firewall)
   vpc_security_group_ids = [aws_security_group.web_server_sg.id]
 
@@ -105,7 +105,21 @@ resource "aws_instance" "web_server" {
   tags = {
     Name = "portfolio-web-server"
   }
+
+  # Require IMDSv2 (session tokens) to block credential theft via SSRF
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
+  # Encrypt the root disk at rest
+  root_block_device {
+    encrypted   = true
+    volume_type = "gp3"
+  }
+
 }
+
 
 # 7. IAM Role for CloudWatch
 resource "aws_iam_role" "cloudwatch_role" {
